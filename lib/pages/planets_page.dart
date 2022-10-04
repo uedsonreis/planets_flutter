@@ -28,13 +28,13 @@ class _PlanetsPageState extends State<PlanetsPage> {
           appBar: AppBar(
             title: Text(widget.title),
           ),
-          body: buildPlanetList(planets),
+          body: _buildPlanetList(planets),
         );
       },
     );
   }
 
-  Widget buildPlanetList(List<Planet> planets) {
+  Widget _buildPlanetList(List<Planet> planets) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: planets.length,
