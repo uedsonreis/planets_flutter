@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planets_app/components/simple_item.dart';
 import 'package:planets_app/model/planet.dart';
 import 'package:planets_app/services/repository.dart';
 
@@ -12,39 +13,46 @@ class MoonsPage extends StatefulWidget {
 }
 
 class _MoonsPageState extends State<MoonsPage> {
-  String _nameMoon = '';
+  final TextEditingController _moonCtrl = TextEditingController();
 
   addMoon() {
-    // print(getMoons());
-    moonRepository.addMoon(widget.planet.id.toString(), _nameMoon);
+    if (_moonCtrl.text.isNotEmpty) {
+      moonRepository
+          .add(
+        widget.planet.id.toString(),
+        _moonCtrl.text,
+      )
+          .then((value) {
+        setState(() => _moonCtrl.text = '');
+      });
+    }
   }
 
-  List<dynamic> getMoons() {
-    return moonRepository.getMoon(widget.planet.id.toString());
+  Future<List<dynamic>> getMoons() async {
+    return await moonRepository.get(widget.planet.id.toString());
   }
 
   @override
   Widget build(BuildContext context) {
-    List<dynamic> moons = getMoons();
     return Scaffold(
       appBar: AppBar(
         title: Text("Moons of ${widget.planet.name}"),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: Column(
           children: [
             TextFormField(
               autocorrect: false,
               enableSuggestions: false,
+              controller: _moonCtrl,
               decoration: const InputDecoration(
                 border: UnderlineInputBorder(),
                 labelText: "Type the moon's name",
               ),
-              onChanged: (value) => setState(() => _nameMoon = value),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
               child: SizedBox(
                 width: double.infinity,
                 child: TextButton(
@@ -61,11 +69,22 @@ class _MoonsPageState extends State<MoonsPage> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: moons.length,
-                itemBuilder: (context, i) {
-                  return Text(moons[i].toString());
+              child: FutureBuilder(
+                future: getMoons(),
+                builder: (context, snapshot) {
+                  List<dynamic> moons = snapshot.hasData ? snapshot.data! : [];
+                  return ListView.builder(
+                    itemCount: moons.length,
+                    itemBuilder: (context, i) {
+                      return SimpleItem(
+                        title: moons[i].toString(),
+                        delete: () => moonRepository.remove(
+                          widget.planet.id.toString(),
+                          moons[i].toString(),
+                        ),
+                      );
+                    },
+                  );
                 },
               ),
             ),
