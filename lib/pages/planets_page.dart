@@ -6,7 +6,7 @@ import 'package:planets_app/services/planet_service.dart';
 class PlanetsPage extends StatefulWidget {
   const PlanetsPage({super.key});
 
-  final String title = "Solar System's Planet";
+  final String title = "Solar System Planets";
 
   @override
   State<PlanetsPage> createState() => _PlanetsPageState();
